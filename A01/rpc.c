@@ -1,3 +1,8 @@
+/* 
+ * Allows player to play x amount of Rock, Paper, Scissors
+ * with an AI, with player choosing x.
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -6,13 +11,14 @@
 
 int main() {
   srand(time(0));
-  int uwins = 0;
-  int cwins = 0;
-  int numplay = 0;
+  int uwins = 0; //number of games user has won
+  int cwins = 0; //number of games AI has won
+  int numplay = 0; //number of games they will play
 
   int random_AI_name = rand() % 4;
   char AI_name[20];
 
+  //chooses a random AI name for program to personify AI with
   if(random_AI_name == 0){
     strcpy(AI_name, "Nancy");
   }else if(random_AI_name == 1){
@@ -43,6 +49,7 @@ int main() {
   printf("How many rounds do you want to play? ");
   scanf("%d", &numplay);
 
+  //if invalid answer, exits
   if(numplay <= 0){
     printf("\n%s thinks you are very rude, and shouldn't ask to play Rock, Paper,\n", AI_name);
     printf("Scissors if you don't actually want to play, but whatever\n\n");
@@ -51,18 +58,20 @@ int main() {
   }
 
   for(int i = 0; i < numplay; i++){
-    char uchoice[25];
-    char cchoice[25];
+    char uchoice[25]; //user/player's choice: "rock", "paper", "scissors"
+    char cchoice[25]; //computer/AI's choice: "rock", "paper", "scissors"
 
-    char AI_wins_verb[25];
-    char AI_loses_verb[25];
+    char AI_wins_verb[25]; //i.e. if rock wins, rock "smashes" scissors
+    char AI_loses_verb[25]; //same as above, but for if AI loses
 
-    int cplay;
-    int uplay;
+    int cplay; //AI choice number designation (0 = r, 1 = p, 2 = s)
+    int uplay; //player choice number designation
+
     printf("\nWhich do you choose? rock, paper, or scissors? ");
     scanf("%s", uchoice);
-    int len = strlen(uchoice);
+    int len = strlen(uchoice); //length of user's choice
     
+    //converts user's choice to lowercase for easy comparison
     for(int i = 0; i < len; i++){
       uchoice[i] = tolower(uchoice[i]);
     }
@@ -86,6 +95,7 @@ int main() {
       strcpy(AI_loses_verb, "smashes");
     }
 
+    //initializes uplay
     if(strcmp(uchoice, "rock") == 0){
       uplay = 0;
     }else if(strcmp(uchoice, "paper") == 0){
@@ -96,8 +106,10 @@ int main() {
       uplay = 3;
     }
 
+    //print AI choice
     printf("\t%s chose %s\n", AI_name, cchoice);
 
+    //prints different results based on who wins
     if(win_chart[cplay][uplay] == 0){
       printf("\tSometimes in life, there are no winners\n");
     }else if(win_chart[cplay][uplay] == 1){
@@ -114,6 +126,7 @@ int main() {
     printf("%s's score: %d, Your score: %d\n", AI_name, cwins, uwins);
   }
 
+  //prints winner
   if(uwins > cwins){
     printf("\nYou have bested %s!\n\n", AI_name);
   }else if(cwins > uwins){

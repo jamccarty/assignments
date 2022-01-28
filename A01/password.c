@@ -8,8 +8,8 @@
 #include <string.h>
 
 int main(){
-	char *pass = NULL;
-	int length;
+	char *pass = NULL; //password, submittedd by user
+	int length; //length of password
 
 	pass = malloc(sizeof(char) * (60));
 	if(pass == NULL){
@@ -22,6 +22,10 @@ int main(){
 
 	printf("You have entered %s as your password\n", pass);
 
+  /*
+   * replaces e's, l's, o's, and a's with
+   * 3's, 1's, 0's, and @'s
+   */
 	for(int i = 0; i < length; i++){
 		if(pass[i] == 'e' || pass[i] == 'E'){
 			pass[i] = '3';
