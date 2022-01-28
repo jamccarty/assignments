@@ -1,22 +1,26 @@
 /*
- * Put your name and motto here
+ * Jac McCarty
+ * Motto: Eat at least one vegetable a day.
  */
-include <stdio.h>
+#include <stdio.h>
 
 int main() {
-printf("Hello vim")
-int a = 0
-scanf("Enter a number: ");
-if (a < 0) {
-  print("a less than zero");
-} else if (a > 0) {
-  print("a greater than zero");
-} else {
-  print(you win!)
+  printf("Hello Vim");
+  int a = 0;
+  printf("Enter a number: \n");
+  if (a < 0) {
+    print("a less than zero");
+  } else if (a > 0) {
+    print("a greater than zero");
+  } else {
+    printf("you win!");
+  }
+  int arr[10];
+  arr[1] = 99;
+  arr[2] = 99;
+  arr[3] = 99; 
 }
-  
-}
-}
+
 
 
 
