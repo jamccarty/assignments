@@ -13,9 +13,19 @@ int main() {
   printf("\nEnter a count: ");
   scanf("%d", &num);
   printf("\n");
+  int len = strlen(word);
+
+  char *repeated;
+  repeated = malloc(sizeof(char) * 32 * num);
+  strcpy(repeated, word);
 
   for(int i = 0; i < num; i++){
-    printf("%s", word);
+    strncat(repeated, word, len);
   }
+  strcat(repeated, "\0");
+  printf("%s", repeated);
   free(word);
+  word = NULL;
+  free(repeated);
+  repeated = NULL;
 }
