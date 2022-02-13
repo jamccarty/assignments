@@ -19,7 +19,7 @@ struct snack {
 
 // Insert a new node to a list (implemented as a linked list). 
 // The new node should store the given properties
-// Param snacks: the first item in the list (NULL if empty)
+// Param head: the first item in the list (NULL if empty)
 // Param name: the snack name (max length is 32 characters)
 // Param quantity: the snack quantity
 // Param cost: the snack cost
@@ -99,7 +99,7 @@ struct snack* insert_sorted(struct snack* head,
 }
 
 // Delete (e.g. free) all nodes in the given list of snacks
-// Param snacks: the first node in the list (NULL if empty)
+// Param head: the first node in the list (NULL if empty)
 void clear(struct snack* head) {
   if(head == NULL){
     return;
@@ -123,6 +123,7 @@ void clear(struct snack* head) {
 }
 
 //prints everything in linked list in appropriate format
+//param snacks: the first snack in the linked list (the head)
 void print(struct snack *snacks){
   int count = 0;
   while(snacks != NULL){
