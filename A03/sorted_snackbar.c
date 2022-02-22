@@ -29,6 +29,8 @@ struct snack* insert_sorted(struct snack* head,
 
   int len = strlen(name);
   char formatted_name[len+1];
+  memset(formatted_name, '\0', sizeof(formatted_name));
+
   if(len > 0){
     formatted_name[0] = toupper(name[0]);
   }
@@ -72,11 +74,6 @@ struct snack* insert_sorted(struct snack* head,
     return s;
   }
 
- // if(strcmp(s->name, head->next->name) < 0){
- //   s->next = head;
- //   return s;
- // }
-
   //places s in appropriate alphabetical spot
   struct snack* prev = head;
   while(prev->next != NULL){
@@ -104,12 +101,14 @@ void clear(struct snack* head) {
   if(head == NULL){
     return;
   }
+
   //if only one item in list, frees it
   if(head->next == NULL){
     free(head);
     head = NULL;
     return;
   }
+
   //frees everything in linked list
   struct snack *loc = head;
   while(loc->next != NULL){
@@ -117,7 +116,7 @@ void clear(struct snack* head) {
     free(loc);
     loc = temp;
   }
-  //frees final item in list
+
   free(loc);
   loc = NULL;
 }
@@ -138,8 +137,8 @@ void print(struct snack *snacks){
     
 
 int main() {
-  struct snack *head;
-  int num;
+  struct snack *head = NULL;
+  int num = 0;
   printf("\nPlease enter the number of snacks you would like to add: ");
   scanf("%d", &num);
 
