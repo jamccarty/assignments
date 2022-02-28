@@ -42,6 +42,8 @@ int main(int argc, char** argv) {
   }
   strcat(glitchname, "-glitch.ppm");
 
+  color_glitch(matrix, h, w);
+
   write_ppm(glitchname, matrix, w, h);
   free(glitchname);
   glitchname = NULL;
