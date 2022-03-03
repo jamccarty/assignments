@@ -6,12 +6,16 @@
 // The values should be returned in a flat float array
 float* readvector(const char* filename, int *size) {
   FILE *file = fopen(filename,"r");
-  char blank;
+
+  if(file == NULL){
+    printf("Problem opening file %s\n", filename);
+    exit(1);
+  }
+
   fscanf(file, "%d", size);
   float *vals = malloc(sizeof(float) * *size);
   for(int i = 0; i < *size; i++){
-    fscanf(file, "%f", &vals[i]); 
-    fscanf(file, "%c", &blank);
+    fscanf(file, " %f", &vals[i]); 
   } 
   fclose(file);
   file = NULL;
