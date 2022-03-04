@@ -18,7 +18,7 @@ struct ppm_pixel** read_ppm(const char* filename, int* w, int* h) {
 
   if(file == NULL){
     printf("ERROR: file location %s is invalid", filename);
-    return NULL;
+    exit(1);
   }
 
   line = malloc(sizeof(char) * 82);
@@ -35,7 +35,7 @@ struct ppm_pixel** read_ppm(const char* filename, int* w, int* h) {
 
   if(line[0] != 'P' && line[1] != '6'){
     printf("ERROR: file %s is not raw\n", filename);
-    return NULL;
+    exit(1);
   }
   line = fgets(line, 81, file);
 
@@ -140,11 +140,8 @@ extern void write_ppm(const char* filename, struct ppm_pixel** pxs, int w, int h
     }
   }
   elems[(h * w * 3)] = '\n';
-  printf("%s", elems);
   fwrite(elems, sizeof(char), (w * h * 3) + 1, file);
 
-  //int e = EOF;
-  //fwrite(&e, sizeof(int), 1, file);
   fclose(file);
   free(elems);
   free(info);
