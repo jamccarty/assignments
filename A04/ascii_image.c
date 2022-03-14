@@ -43,6 +43,12 @@ int main(int argc, char** argv) {
 
     printf("\n"); //printing para break to separate each row
   }
+  for(int i = 0; i < h; i++){
+    free(matrix[i]);
+    matrix[i] = NULL;
+  }
+  free(matrix);
+  matrix = NULL;
   return 0;
 }
 
