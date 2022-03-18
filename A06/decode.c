@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <string.h>
 #include "read_ppm.h"
 
 //convert 8-bit binary number to char
@@ -34,6 +35,7 @@ int main(int argc, char** argv) {
   struct ppm_pixel** pxs = read_ppm(argv[1], &w, &h); //build pixel matrix
   mes_len = (w * h * 3)/8;
   message = malloc(sizeof(char) * mes_len + sizeof(char));
+  memset(message, '\0', mes_len);
 
   //holds each character, decoded one bit at a time from the pixel data
   unsigned char ch[9];
