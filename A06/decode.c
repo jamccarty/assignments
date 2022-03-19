@@ -9,17 +9,6 @@
 #include <string.h>
 #include "read_ppm.h"
 
-//convert 8-bit binary number to char
-char convert(unsigned char arr[]){
-  char val = 0;
-  for(int i = 0; i < 8; i++){
-    if(arr[i] == 1){
-      val = val + pow(2, 7-i);
-    }
-  }
-  return val;
-}
-
 int main(int argc, char** argv) {
   if(argc <= 1){
     printf("Program needs file name as runtime argument\n");
@@ -35,36 +24,46 @@ int main(int argc, char** argv) {
   struct ppm_pixel** pxs = read_ppm(argv[1], &w, &h); //build pixel matrix
   mes_len = (w * h * 3)/8;
   message = malloc(sizeof(char) * mes_len + sizeof(char));
-  memset(message, '\0', mes_len);
+  for(int i = 0; i < mes_len; i++){
+    message[i] = 0x0;
+  }
 
-  //holds each character, decoded one bit at a time from the pixel data
-  unsigned char ch[9];
-  int count = 0; //holds current location within ch array
-  int mesloc = 0; //holds current location within message
-  for(int i = 0; i < h; i++){
-    for(int j = 0; j < w; j++){
-      for(int k = 0; k < 3; k++){
+  int hcount = 0; //primary coordinate in pxs array
+  int wcount = 0; //secondary coordinate in pxs array
+  int icount = 0; //location in pxs[hcount][wcount] color array
+  int charcount = 0; //character location in decoded message
+  unsigned char mask = 0x1;
+  int pos =  0;
+  
 
-        //if reached end of current char, add to message and reset
-        if(count == 8){
-          message[mesloc] = convert(ch);
-          mesloc++;
-          count = 0;
-        }
+  while(hcount != h){
+    unsigned char bit;
 
-        if(pxs[i][j].colors[k] % 2 == 0){
-          //if current pixel color is even, add zero to current char
-          ch[count] = (unsigned char)0; 
-        }else{
-          //if odd, add 1 (I don't know why I'm casting instead of
-          //just saying '1' or '0' but I'm too afraid to mess with it
-          //trust the process
-          ch[count] = (unsigned char)1;
-        }
-        count++; //move to next pixel color, next bit in char
-      }
+    if(charcount > mes_len){
+      break;
+    }
+
+    bit = pxs[hcount][wcount].colors[icount] & mask;
+    bit = bit << (7 - pos);
+    message[charcount] = message[charcount] | bit;
+
+    icount++;
+    pos++;
+
+    if(icount == 3){
+      icount = 0;
+      wcount++;
+    }
+    if(wcount == w){
+      wcount = 0;
+      hcount++;
+    }
+    if(pos == 8){
+      pos = 0;
+      charcount++;
     }
   }
+
   printf("%s\n", message);
 
   //free all heap space

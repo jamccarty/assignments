@@ -15,27 +15,12 @@
 #include <math.h>
 #include "read_ppm.h"
 
-//returns least significant bit in binary form of unsigned char
-unsigned char leastBit(unsigned char ch){
-  return '0' + (ch % 2);
-}
-
-//returns 8-bit binary form of single unsigned character
-//as array of unsigned characters where bin[0] is most significant
-//bit and bin[7] is the least significant
-unsigned char* encode(unsigned char msg){
-  unsigned char *bin = malloc(sizeof(unsigned char) * 8);
-  int b = 7;
-  for(int i = 0; i < 8; i++){
-    if(msg % 2 == 1){
-      bin[b] = '1';
-    }else{
-      bin[b] = '0';
-    }
-    b--;
-    msg = msg / 2;
+unsigned char store_bit(unsigned char ch, unsigned char px){
+  if(ch == 0x0){
+    ch = ~ch - 1;
+    return ch & px;
   }
-  return bin;
+  return ch | px;
 }
 
 int main(int argc, char** argv) {
@@ -77,45 +62,61 @@ int main(int argc, char** argv) {
   }
   int len = strlen(message); //len is now actual length of message
 
-  //array of arrays. each unsigned char* array is the 8-bit binary form
-  //of each character in message
-  unsigned char **binmsg = malloc(sizeof(unsigned char*) * (len + 1));
+  unsigned char mes_masks[8] = {0x80, 0x40, 0x20, 0x10, 0x08, 0x04, 0x02, 0x01};
 
-  //encoding each bit in message
-  for(int i = 0; i < len; i++){
-    binmsg[i] = encode(message[i]);
-  }
-  //encoding end of string
-  binmsg[len] = encode('\0');
+  int hcount = 0; 
+  int wcount = 0;
+  int icount = 0;
+  int charcount = 0;
+  int shift_mask = 7;
 
-  int loc = 0; //location within the binmsg array
-  int e = 0; //location within each char byte in binmsg array
-  
-  for(int i = 0; i < h; i++){
-    for(int j = 0; j < w; j++){
-      for(int k = 0; k < 3; k++){
-        if(loc < (len + 1)){
-          //ch is least significant bit in current 8-bit color
-          char ch = leastBit(pxs[i][j].colors[k]);
-          //if it doesn't already equal the next bit in binmsg
-          if(ch != binmsg[loc][e]){
-            if(pxs[i][j].colors[k] < 255){
-              pxs[i][j].colors[k]++;
-            }else{
-              //if ch=255, subtracts 1 to prevent overflow
-              pxs[i][j].colors[k]--;
-            }
-          }
-        }
-        e++; //move to next bit
-        //if at last bit, move to next "char" in binmsg
-        if(e == 8){
-          loc++;
-          e = 0;
-        }
-      }
+  while(charcount != len){
+    unsigned char bit = message[charcount] & mes_masks[7 - shift_mask];
+
+    bit = bit >> shift_mask;
+
+    pxs[hcount][wcount].colors[icount] = store_bit(bit, 
+        pxs[hcount][wcount].colors[icount]);
+
+    icount++;
+    shift_mask--;
+
+    if(icount == 3){
+      icount = 0;
+      wcount++;
+    }
+
+    if(wcount == w){
+      wcount = 0;
+      hcount++;
+    }
+
+    if(shift_mask == -1){
+      shift_mask = 7;
+      charcount++;
     }
   }
+
+  for(int i = 0; i < 8; i++){
+    if(icount == 3){
+      icount = 0;
+      wcount++;
+    }
+    if(wcount == w){
+      wcount = 0;
+      hcount++;
+    }
+    if(hcount == h){
+      break;
+    }
+
+    unsigned char bit = '\0' & mes_masks[i];
+    pxs[hcount][wcount].colors[icount] = store_bit(bit,
+        pxs[hcount][wcount].colors[icount]);
+    icount++;
+  }
+
+
   //length of source file name
   int fl = strlen(argv[1]);
   char *newfile;
@@ -140,12 +141,6 @@ int main(int argc, char** argv) {
   //free all memory
   free(newfile);
   newfile = NULL;
-  for(int i = 0; i <= len; i++){
-    free(binmsg[i]);
-    binmsg[i] = NULL;
-  }
-  free(binmsg);
-  binmsg = NULL;
 
   for(int i = 0; i < h; i++){
     free(pxs[i]);
