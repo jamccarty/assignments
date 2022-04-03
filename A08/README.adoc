@@ -1,21 +1,106 @@
 = Hardware specifications
 
 Where did your run your tests? A laptop, or goldengate?
-
+  I ran my tests on my personal laptop laptop.
 
 What are the performance specifications of the machine: number and speed of
 processors, size of RAM? (use `lscpu` and `free -m`)
-
+  8 CPUs, 2304.007 MHz
+  7848 mebibytes mem, 2048 mebibytes swap
 
 = Allocations
 
 In `simple.c`, where does the increase in 1040 bytes come from?
 Why is the value 1040 bytes?
-
+  1024 bytes come from the sbrk() buffer; the remaining 16 bytes come
+  from the 'sentinel' which contains information about the bounds of the 
+  allocated memory
 
 How many bytes does `mylloc_list.c` allocate when the program ends? Explain why
 this amount makes sense.
-
+  The malloc method in mylloc_list.c allocates SIZE + 16 bytes of memory, 
+  where the function is called with malloc(SIZE). This amount makes sense
+  because SIZE is the amount of bytes you want stored, and then the remaining
+  16 bytes is because there are "sentinels" flanking the allocated memory that contain
+  information about the allocated space.
 
 = Fragementation
 
+What is fragmentation:
+  Fragmentation is a way of maximizing chunk usage. It keeps track of
+  the unused space in each chunk, and when it gets to be too great, it
+  divides chunks into two smaller chunks, leaving the secondary chunk 
+  free.
+What is the difference between internal and external fragmentation?
+  Internal fragmentation is the unused space in the "used" chunks, i.e.
+  when you divide chunks into smaller chunks. External fragmentation is 
+  when you recombine smaller chunks and put them in the freed pile.
+
+  With this implementation, since we don't actually "split" chunks,
+  internal fragmentation refers to the unused space in allocated chunks
+  and external fragmentation refers to the unused space in the freed list
+  (which would theoretically be all bytes in a freed chunk, since it has
+  been freed).
+
+Output:
+  The initial top of the heap is 0x7fbab4ce2000.
+  Total chunks: 161 Free: 103 Used: 58
+  Internal unusued: total: 1826304 average: 31488.0 smallest: 31488 largest: 31488
+  External unused: total: 144345 average: 1401.4 smallest: 10 largest: 3984
+  0
+  The current top of the heap is 0x7fbab4d38527.
+  Increased by 345 (0x159) Kbyte
+  Total chunks: 167 Free: 113 Used: 54
+  Internal unusued: total: 1700352 average: 31488.0 smallest: 31488 largest: 31488
+  External unused: total: 177549 average: 1571.2 smallest: 10 largest: 3984
+  1
+  The current top of the heap is 0x7fbab4d3e327.
+  Increased by 368 (0x170) Kbyte
+  Total chunks: 169 Free: 117 Used: 52
+  Internal unusued: total: 1637376 average: 31488.0 smallest: 31488 largest: 31488
+  External unused: total: 189341 average: 1618.3 smallest: 10 largest: 3997
+  2
+  The current top of the heap is 0x7fbab4d40282.
+  Increased by 376 (0x178) Kbyte
+  Total chunks: 172 Free: 120 Used: 52
+  Internal unusued: total: 1637376 average: 31488.0 smallest: 31488 largest: 31488
+  External unused: total: 201235 average: 1677.0 smallest: 10 largest: 3998
+  3
+  The current top of the heap is 0x7fbab4d43188.
+  Increased by 388 (0x184) Kbyte
+  Total chunks: 175 Free: 125 Used: 50
+  Internal unusued: total: 1574400 average: 31488.0 smallest: 31488 largest: 31488
+  External unused: total: 222205 average: 1777.6 smallest: 10 largest: 3999
+  4
+  The current top of the heap is 0x7fbab4d46095.
+  Increased by 400 (0x190) Kbyte
+  Total chunks: 176 Free: 116 Used: 60
+  Internal unusued: total: 1889280 average: 31488.0 smallest: 31488 largest: 31488
+  External unused: total: 189140 average: 1630.5 smallest: 10 largest: 3999
+  5
+  The current top of the heap is 0x7fbab4d47045.
+  Increased by 404 (0x194) Kbyte
+  Total chunks: 176 Free: 128 Used: 48
+  Internal unusued: total: 1511424 average: 31488.0 smallest: 31488 largest: 31488
+  External unused: total: 227231 average: 1775.2 smallest: 10 largest: 4000
+  6
+  The current top of the heap is 0x7fbab4d47045.
+  Increased by 404 (0x194) Kbyte
+  Total chunks: 177 Free: 125 Used: 52
+  Internal unusued: total: 1637376 average: 31488.0 smallest: 31488 largest: 31488
+  External unused: total: 219943 average: 1759.5 smallest: 10 largest: 3999
+  7
+  The current top of the heap is 0x7fbab4d47ff5.
+  Increased by 407 (0x197) Kbyte
+  Total chunks: 178 Free: 118 Used: 60
+  Internal unusued: total: 1889280 average: 31488.0 smallest: 31488 largest: 31488
+  External unused: total: 193697 average: 1641.5 smallest: 10 largest: 4000
+  8
+  The current top of the heap is 0x7fbab4d48fa5.
+  Increased by 411 (0x19b) Kbyte
+  Total chunks: 178 Free: 130 Used: 48
+  Internal unusued: total: 1511424 average: 31488.0 smallest: 31488 largest: 31488
+  External unused: total: 237661 average: 1828.2 smallest: 10 largest: 4000
+  9
+  The current top of the heap is 0x7fbab4d48fa5.
+  Increased by 411 (0x19b) Kbyte
