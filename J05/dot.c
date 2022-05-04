@@ -6,42 +6,33 @@
 
 #define SIZE 100000
 
-struct arg{
-  int u[SIZE];
+struct argument{
   int v[SIZE];
-  int start;
-  int end;
-  int *dotproduct;
+  int u[SIZE];
+
+  int start_pos;
+  int end_pos;
+  int ret;
 };
 
-void* compute(void* args){
-  struct arg a = *((struct arg *)args);
-  for (int i = a.start; i < a.end; i++) {
-    *a.dotproduct += a.u[i] * a.v[i];
-    if(i % (SIZE/4) == 0){
-      printf("%d\n", *a.dotproduct);
-    }
+void *compute(void *arg){
+  struct argument *a = (struct argument *)arg;
+  a->ret = 0;
+  for(int i = a->start_pos; i < a->end_pos; i++){
+    a->ret += a->u[i] * a->v[i];
   }
-  return (void *)a.dotproduct;
+  return NULL;
 }
 
 int main(int argc, char *argv[]) {
   srand(time(0));
-  pthread_t threads[4];
-  int ids[4];
+  pthread_t tids[4];
 
   int v[SIZE];
   int u[SIZE];
-  int dotproduct;
-  dotproduct = 0;
-  int products[4];
-  struct arg a[4];
-  for(int i = 0; i < 4; i++){
-    a[i].start = i * SIZE/4;
-    a[i].end = a[i].start + SIZE/4;
-    a[i].dotproduct = &products[i];
-  }
-
+  int dotproduct = 0;
+  int thread_dotproduct = 0;
+  struct argument a[4];
    
   for (int i = 0; i < SIZE; i++) {
     v[i] = rand() % 1000 - 500;
@@ -52,24 +43,27 @@ int main(int argc, char *argv[]) {
     }
     dotproduct += u[i] * v[i];
   }
+
+  for(int i = 0; i < 4; i++){
+    tids[i] = i;
+    a[i].start_pos = (SIZE * i)/4;
+    a[i].end_pos = (SIZE * (i + 1))/4;
+    pthread_create(&tids[i], NULL, compute, (void *)&a[i]);
+  }
+
+  for(int i = 0; i < 4; i++){
+    pthread_join(tids[i], NULL);
+  }
+
+  for(int i = 0; i < 4; i++){
+    thread_dotproduct += a[i].ret;
+  }
+
   printf("Ground truth dot product: %d\n", dotproduct);
-
-  for(int i = 0; i < 4; i++){
-    pthread_create(&threads[i], NULL, compute, &a);
-  }
-
-  for(int i = 0; i < 4; i++){
-    pthread_join(threads[i], (void **)&products);
-  }
-
-  for(int i = 0; i < 4; i++){
-    dotproduct += products[i];
-    printf("%d\n", products[i]);
-  }
 
   // TODO: Implement your thread solution here
   printf("Test with 4 threads\n");
-  printf("With 4 threads: dotproduct = %d\n", dotproduct);
+  printf("Thread dot product: %d\n", thread_dotproduct);
 
   return 0;
 }
