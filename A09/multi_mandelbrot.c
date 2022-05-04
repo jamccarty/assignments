@@ -57,33 +57,22 @@ int main(int argc, char* argv[]) {
     pallet[i].blue = baseblue + (rand() % 100) - 50;
   }
 
-  int shmid = shmget(IPC_PRIVATE, sizeof(struct ppm_pixel*) * size, 0644 | IPC_CREAT);
-  int *shmids = malloc(sizeof(int) * size);
-  if(shmid == -1){
-    printf("ERROR: cannot create shared shmid memory - pxs\n");
+  int shmid;
+  shmid = shmget(IPC_PRIVATE, sizeof(struct ppm_pixel) * size *size, 0644 | IPC_CREAT);
+  if (shmid == -1) {
+    perror("Error: cannot initialize shared memory\n");
     exit(1);
   }
 
-  struct ppm_pixel **pxs = shmat(shmid, NULL, 0);
-
-  if(pxs == (void*)-1){
-    printf("ERROR: cannot access shared memory - pxs\n");
+  struct ppm_pixel* buffer = shmat(shmid, NULL, 0);
+  if (buffer == (void*) -1) {
+    perror("Error: cannot access shared memory\n");
     exit(1);
-  }
+  } 
 
-  for(int i = 0; i < size; i++){
-    shmids[i] = shmget(IPC_PRIVATE, sizeof(struct ppm_pixel) * size, 0644 | IPC_CREAT);
-
-    if(shmids[i] == -1){
-      printf("ERROR: cannot created shared shmids memory - pxs[%d]\n", i);
-      exit(1);
-    }
-
-    pxs[i] = shmat(shmids[i], NULL, 0);
-    if(pxs[i] == (void*)-1){
-      printf("ERROR: cannot access shared memory - pxs[%d]\n", i);
-      exit(1);
-    }
+  struct ppm_pixel** pxs = malloc(sizeof(struct ppm_pixel*) * size);
+  for (int i = 0; i < size; i++) {
+    pxs[i] = &(buffer[i*size]); 
   }
 
   int row_start_interval = 0;
@@ -156,8 +145,6 @@ int main(int argc, char* argv[]) {
   for (int i = 0; i < 4; i++) {
     free(pallet);
     pallet = NULL;
-    free(shmids);
-    shmids = NULL;
     if(row_start_interval == size/2 || col_start_interval == size/2){
       exit(0);
     }
@@ -185,6 +172,17 @@ int main(int argc, char* argv[]) {
       size, size, timetaken);
   printf("Writing file: %s\n", name);
   // compute image
+
+  free(pxs);
+  free(pallet);
+  pallet = NULL;
+  if (shmdt(buffer) == -1) {
+    perror("Error: cannot detatch from shared memory\n");
+    exit(1);
+  }
+
+  if (shmctl(shmid, IPC_RMID, 0) == -1) {
+    perror("Error: cannot remove shared memory\n");
+    exit(1);
+  }   
 }
-
-
